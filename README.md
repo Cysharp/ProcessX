@@ -2,7 +2,7 @@ ProcessX
 ===
 [![CircleCI](https://circleci.com/gh/Cysharp/ProcessX.svg?style=svg)](https://circleci.com/gh/Cysharp/ProcessX)
 
-ProcessX simplify call an external process with the aync streams in C# 8.0. You can receive standard output results by `await foreach`, it is completely asynchronous and realtime.
+ProcessX simplifies call an external process with the aync streams in C# 8.0 without complex `Process` code. You can receive standard output results by `await foreach`, it is completely asynchronous and realtime.
 
 ```csharp
 using Cysharp.Diagnostics; // using namespace
