@@ -28,7 +28,7 @@ await foreach (string item in ProcessX.StartAsync("dotnet --info"))
 }
 
 // receive buffered result(similar as WaitForExit).
-string[] result = await ProcessX.StartAsync("dotnet --info").AsTask();
+string[] result = await ProcessX.StartAsync("dotnet --info").ToTask();
 
 // when ExitCode is not 0 or StandardError is exists, throws ProcessErrorException
 try
@@ -72,6 +72,8 @@ using (var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(1)))
 StartAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 StartAsync(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 StartAsync(ProcessStartInfo processStartInfo)
+
+Task<string[]> ToTask(CancellationToken cancellationToken = default)
 ```
 
 Competitor
