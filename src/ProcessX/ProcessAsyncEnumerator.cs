@@ -30,7 +30,7 @@ namespace Cysharp.Diagnostics
         }
 
 #pragma warning disable CS8603
-        // whenn call after MoveNext, current always not null.
+        // when call after MoveNext, current always not null.
         public string Current => current;
 #pragma warning restore CS8603
 
