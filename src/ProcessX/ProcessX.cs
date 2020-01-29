@@ -9,7 +9,7 @@ namespace Cysharp.Diagnostics
 {
     public static class ProcessX
     {
-        public static ProcessAsyncEnumerable StartAsync(string command, string workingDirectory = null, IDictionary<string, string> environmentVariable = null, Encoding encoding = null)
+        public static ProcessAsyncEnumerable StartAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
         {
             var cmdBegin = command.IndexOf(' ');
             if (cmdBegin == -1)
@@ -24,7 +24,7 @@ namespace Cysharp.Diagnostics
             }
         }
 
-        public static ProcessAsyncEnumerable StartAsync(string fileName, string arguments, string workingDirectory = null, IDictionary<string, string> environmentVariable = null, Encoding encoding = null)
+        public static ProcessAsyncEnumerable StartAsync(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
         {
             var pi = new ProcessStartInfo()
             {
@@ -78,7 +78,7 @@ namespace Cysharp.Diagnostics
 
             var errorList = new List<string>();
 
-            var waitOutputDataCompleted = new TaskCompletionSource<object>();
+            var waitOutputDataCompleted = new TaskCompletionSource<object?>();
             process.OutputDataReceived += (sender, e) =>
             {
                 if (e.Data != null)
@@ -91,7 +91,7 @@ namespace Cysharp.Diagnostics
                 }
             };
 
-            var waitErrorDataCompleted = new TaskCompletionSource<object>();
+            var waitErrorDataCompleted = new TaskCompletionSource<object?>();
             process.ErrorDataReceived += (sender, e) =>
             {
                 if (e.Data != null)
@@ -109,8 +109,12 @@ namespace Cysharp.Diagnostics
 
             process.Exited += async (sender, e) =>
             {
-                await waitOutputDataCompleted.Task.ConfigureAwait(false);
                 await waitErrorDataCompleted.Task.ConfigureAwait(false);
+
+                if (errorList.Count != 0)
+                {
+                    await waitOutputDataCompleted.Task.ConfigureAwait(false);
+                }
 
                 if (process.ExitCode != 0)
                 {

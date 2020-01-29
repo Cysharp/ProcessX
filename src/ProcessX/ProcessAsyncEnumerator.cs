@@ -12,7 +12,7 @@ namespace Cysharp.Diagnostics
         readonly ChannelReader<string> channel;
         readonly CancellationToken cancellationToken;
         readonly CancellationTokenRegistration cancellationTokenRegistration;
-        string current;
+        string? current;
         bool disposed;
 
         public ProcessAsyncEnumerator(Process process, ChannelReader<string> channel, CancellationToken cancellationToken)
@@ -29,7 +29,10 @@ namespace Cysharp.Diagnostics
             }
         }
 
+#pragma warning disable CS8603
+        // whenn call after MoveNext, current always not null.
         public string Current => current;
+#pragma warning restore CS8603
 
         public async ValueTask<bool> MoveNextAsync()
         {

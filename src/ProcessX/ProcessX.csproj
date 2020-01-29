@@ -3,6 +3,19 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
         <LangVersion>8.0</LangVersion>
+        <Nullable>enable</Nullable>
+
+        <!-- NuGet Packaging -->
+        <PackageVersion>$(Version)</PackageVersion>
+        <Company>Cysharp</Company>
+        <Authors>Cysharp</Authors>
+        <Copyright>© Cysharp, Inc.</Copyright>
+        <PackageTags>process;async;</PackageTags>
+        <Description>Simplify call external process with the async streams in C# 8.0.</Description>
+        <PackageProjectUrl>https://github.com/Cysharp/ProcessX</PackageProjectUrl>
+        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">

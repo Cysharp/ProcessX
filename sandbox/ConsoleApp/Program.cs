@@ -6,7 +6,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        await foreach (var item in ProcessX.StartAsync("dotnet build --help"))
+        await foreach (var item in ProcessX.StartAsync("git --help"))
         {
             Console.WriteLine(item);
         }
