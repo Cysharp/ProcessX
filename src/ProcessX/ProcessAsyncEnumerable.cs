@@ -24,7 +24,7 @@ namespace Cysharp.Diagnostics
             return new ProcessAsyncEnumerator(process, channel, cancellationToken);
         }
 
-        public async Task<string[]> AsTask(CancellationToken cancellationToken = default)
+        public async Task<string[]> ToTask(CancellationToken cancellationToken = default)
         {
             var list = new List<string>();
             await foreach (var item in this.WithCancellation(cancellationToken).ConfigureAwait(false))
