@@ -30,7 +30,7 @@ await foreach (string item in ProcessX.StartAsync("dotnet --info"))
 // receive buffered result(similar as WaitForExit).
 string[] result = await ProcessX.StartAsync("dotnet --info").AsTask();
 
-// when ExitCode is not 0 or ErrorOutput is exists, throws ProcessErrorException
+// when ExitCode is not 0 or StandardError is exists, throws ProcessErrorException
 try
 {
     await foreach (var item in ProcessX.StartAsync("dotnet --foo --bar")) { }
@@ -66,7 +66,7 @@ using (var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(1)))
 }
 ```
 
-ProcessX.StartAsync overloads, you can set workingDirectory, environmentVariable, encoding.
+`ProcessX.StartAsync` overloads, you can set workingDirectory, environmentVariable, encoding.
 
 ```csharp
 StartAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
