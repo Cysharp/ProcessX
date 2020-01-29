@@ -111,7 +111,7 @@ namespace Cysharp.Diagnostics
             {
                 await waitErrorDataCompleted.Task.ConfigureAwait(false);
 
-                if (errorList.Count != 0)
+                if (errorList.Count == 0)
                 {
                     await waitOutputDataCompleted.Task.ConfigureAwait(false);
                 }
