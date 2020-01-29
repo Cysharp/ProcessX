@@ -12,7 +12,7 @@ Install library from NuGet that support from `.NET Standard 2.0`.
 
 > PM> Install-Package [ProcessX](https://www.nuget.org/packages/ProcessX)
 
-Main API is only `Cysharp.Diagnostics.ProcessX.Start` and throws `ProcessErrorException` when error detected.
+Main API is only `Cysharp.Diagnostics.ProcessX.StartAsync` and throws `ProcessErrorException` when error detected.
 
 * **Simple**, only write single string command like the shell script.
 * **Asynchronous**, by C# 8.0 async streams.
