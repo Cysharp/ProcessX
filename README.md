@@ -45,7 +45,7 @@ catch (ProcessErrorException ex)
 
 Reference
 ---
-to Cancel, you can use `WithCancellationToken`.
+to Cancel, you can use `WithCancellation` of IAsyncEnumerable.
 
 ```csharp
 await foreach (var item in ProcessX.StartAsync("dotnet --info").WithCancellation(cancellationToken))
