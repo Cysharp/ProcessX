@@ -4,14 +4,7 @@ ProcessX
 
 ProcessX simplifies call an external process with the aync streams in C# 8.0 without complex `Process` code. You can receive standard output results by `await foreach`, it is completely asynchronous and realtime.
 
-```csharp
-using Cysharp.Diagnostics; // using namespace
-
-await foreach (var item in ProcessX.StartAsync("dotnet build --help"))
-{
-    Console.WriteLine(item);
-}
-```
+![image](https://user-images.githubusercontent.com/46207/73369038-504f0c80-42f5-11ea-8b36-5c5c979ac882.png)
 
 Getting Started
 ---
@@ -26,6 +19,8 @@ Main API is only `Cysharp.Diagnostics.ProcessX.Start` and throws `ProcessErrorEx
 * **Manage Error**, handling exitcode and stderror.
 
 ```csharp
+using Cysharp.Diagnostics; // using namespace
+
 // async iterate.
 await foreach (string item in ProcessX.StartAsync("dotnet --info"))
 {
@@ -35,7 +30,7 @@ await foreach (string item in ProcessX.StartAsync("dotnet --info"))
 // receive buffered result(similar as WaitForExit).
 string[] result = await ProcessX.StartAsync("dotnet --info").AsTask();
 
-// when ExitCode is not 0 or ErrorOutput is exists, throws ProcessErrorException
+// when ExitCode is not 0 or StandardError is exists, throws ProcessErrorException
 try
 {
     await foreach (var item in ProcessX.StartAsync("dotnet --foo --bar")) { }
@@ -71,7 +66,7 @@ using (var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(1)))
 }
 ```
 
-ProcessX.StartAsync overloads, you can set workingDirectory, environmentVariable, encoding.
+`ProcessX.StartAsync` overloads, you can set workingDirectory, environmentVariable, encoding.
 
 ```csharp
 StartAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
