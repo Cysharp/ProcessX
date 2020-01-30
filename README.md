@@ -57,9 +57,9 @@ await foreach (var item in ProcessX.StartAsync("dotnet --info").WithCancellation
 timeout, you can use `CancellationTokenSource(delay)`.
 
 ```csharp
-using (var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(1)))
+using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1)))
 {
-    await foreach (var item in ProcessX.StartAsync("dotnet --info").WithCancellation(tcs.Token))
+    await foreach (var item in ProcessX.StartAsync("dotnet --info").WithCancellation(cts.Token))
     {
         Console.WriteLine(item);
     }
