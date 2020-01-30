@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessX", "src\ProcessX\ProcessX.csproj", "{7C485BF1-5E74-4638-9179-0F535E3F4DE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessX", "src\ProcessX\ProcessX.csproj", "{7C485BF1-5E74-4638-9179-0F535E3F4DE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessX.Tests", "tests\ProcessX.Tests\ProcessX.Tests.csproj", "{F4E6B8E8-9F69-445C-823B-A594AB23599E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessX.Tests", "tests\ProcessX.Tests\ProcessX.Tests.csproj", "{F4E6B8E8-9F69-445C-823B-A594AB23599E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "sandbox\ConsoleApp\ConsoleApp.csproj", "{FF47BCEA-0910-4A16-B7F7-1F92498085A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "sandbox\ConsoleApp\ConsoleApp.csproj", "{FF47BCEA-0910-4A16-B7F7-1F92498085A8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sandbox", "sandbox", "{E867683A-4F47-421A-B666-53178446B942}"
 EndProject
@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C4449B34-8
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReturnMessage", "sandbox\ReturnMessage\ReturnMessage.csproj", "{0E468B58-A81E-450D-B4E4-32B087EBE1F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{FF47BCEA-0910-4A16-B7F7-1F92498085A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF47BCEA-0910-4A16-B7F7-1F92498085A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF47BCEA-0910-4A16-B7F7-1F92498085A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E468B58-A81E-450D-B4E4-32B087EBE1F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E468B58-A81E-450D-B4E4-32B087EBE1F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E468B58-A81E-450D-B4E4-32B087EBE1F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E468B58-A81E-450D-B4E4-32B087EBE1F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -49,6 +55,7 @@ Global
 		{7C485BF1-5E74-4638-9179-0F535E3F4DE1} = {3651D11A-EAA0-4489-8982-B0B64C758EF4}
 		{F4E6B8E8-9F69-445C-823B-A594AB23599E} = {737CE3B1-18AD-4A89-9EA7-1EE2ACB931DD}
 		{FF47BCEA-0910-4A16-B7F7-1F92498085A8} = {E867683A-4F47-421A-B666-53178446B942}
+		{0E468B58-A81E-450D-B4E4-32B087EBE1F7} = {E867683A-4F47-421A-B666-53178446B942}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5585A8D-24C7-479E-8B7F-1017D80E2214}

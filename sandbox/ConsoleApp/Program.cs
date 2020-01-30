@@ -9,7 +9,10 @@ class Program
 
     static async Task Main(string[] args)
     {
-        await ProcessX.StartAsync("dotnet --info").WriteLineAllAsync();
+        var path = @"..\..\..\..\ReturnMessage\ReturnMessage.csproj";
+        // await ProcessX.StartAsync($"dotnet run --project {path} -- str -m foo -c 10").WriteLineAllAsync();
+
+        var bin = await ProcessX.StartReadBinaryAsync($"dotnet run --project {path} -- bin -s 999 -c 10 -w 10");
 
         //// first argument is Process, if you want to know ProcessID, use StandardInput, use it.
         //var (_, stdOut, stdError) = ProcessX.GetDualAsyncEnumerable("dotnet --foo --bar");
@@ -44,5 +47,6 @@ class Program
         //    // ex.ErrorOutput is empty, if you want to use it, buffer yourself.
         //    // Console.WriteLine(string.Join(Environment.NewLine, errorBuffered));
         //}
+        Console.WriteLine(bin.Length);
     }
 }

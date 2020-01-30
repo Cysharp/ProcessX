@@ -110,6 +110,14 @@ catch (ProcessErrorException ex)
 }
 ```
 
+Read Binary Data
+---
+If stdout is binary data, you can use `StartReadBinaryAsync` to read `byte[]`.
+
+```csharp
+byte[] bin = await ProcessX.StartReadBinaryAsync($"...");
+```
+
 Reference
 ---
 `ProcessX.StartAsync` overloads, you can set workingDirectory, environmentVariable, encoding.
@@ -124,6 +132,11 @@ StartAsync(ProcessStartInfo processStartInfo)
 GetDualAsyncEnumerable(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 GetDualAsyncEnumerable(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 GetDualAsyncEnumerable(ProcessStartInfo processStartInfo)
+
+// return Task<byte[]>
+StartReadBinaryAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+StartReadBinaryAsync(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+StartReadBinaryAsync(ProcessStartInfo processStartInfo)
 
 // return Task<string[]>
 ToTask(CancellationToken cancellationToken = default)
