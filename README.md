@@ -68,7 +68,7 @@ using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1)))
 
 Raw Process/StdError Stream
 ---
-In default, when stdError is used, buffering error messages and throws `ProcessErrorException` with error messages after process exited. If you want to use stdError in streaming, you can use `GetDualAsyncEnumerable` method. Also `GetDualAsyncEnumerable` can get raw `Process`, you can use `ProcessID`, `StandardInput` etc.
+In default, when stdError is used, buffering error messages and throws `ProcessErrorException` with error messages after process exited. If you want to use stdError in streaming or avoid throws error when process using stderror as progress, diagnostics, you can use `GetDualAsyncEnumerable` method. Also `GetDualAsyncEnumerable` can get raw `Process`, you can use `ProcessID`, `StandardInput` etc.
 
 ```csharp
 // first argument is Process, if you want to know ProcessID, use StandardInput, use it.
