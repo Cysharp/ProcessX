@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -9,19 +10,44 @@ namespace Cysharp.Diagnostics
 {
     public static class ProcessX
     {
-        public static ProcessAsyncEnumerable StartAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+        static (string fileName, string? arguments) ParseCommand(string command)
         {
             var cmdBegin = command.IndexOf(' ');
             if (cmdBegin == -1)
             {
-                return StartAsync(command, null, workingDirectory, environmentVariable, encoding);
+                return (command, null);
             }
             else
             {
                 var fileName = command.Substring(0, cmdBegin);
                 var arguments = command.Substring(cmdBegin + 1, command.Length - (cmdBegin + 1));
-                return StartAsync(fileName, arguments, workingDirectory, environmentVariable, encoding);
+                return (fileName, arguments);
             }
+        }
+
+        static Process SetupRedirectableProcess(ref ProcessStartInfo processStartInfo, bool redirectStandardInput)
+        {
+            // override setings.
+            processStartInfo.UseShellExecute = false;
+            processStartInfo.CreateNoWindow = true;
+            processStartInfo.ErrorDialog = false;
+            processStartInfo.RedirectStandardError = true;
+            processStartInfo.RedirectStandardOutput = true;
+            processStartInfo.RedirectStandardInput = redirectStandardInput;
+
+            var process = new Process()
+            {
+                StartInfo = processStartInfo,
+                EnableRaisingEvents = true,
+            };
+
+            return process;
+        }
+
+        public static ProcessAsyncEnumerable StartAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+        {
+            var (fileName, arguments) = ParseCommand(command);
+            return StartAsync(fileName, arguments, workingDirectory, environmentVariable, encoding);
         }
 
         public static ProcessAsyncEnumerable StartAsync(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
@@ -56,18 +82,7 @@ namespace Cysharp.Diagnostics
 
         public static ProcessAsyncEnumerable StartAsync(ProcessStartInfo processStartInfo)
         {
-            // override setings.
-            processStartInfo.UseShellExecute = false;
-            processStartInfo.CreateNoWindow = true;
-            processStartInfo.ErrorDialog = false;
-            processStartInfo.RedirectStandardError = true;
-            processStartInfo.RedirectStandardOutput = true;
-
-            var process = new Process()
-            {
-                StartInfo = processStartInfo,
-                EnableRaisingEvents = true,
-            };
+            var process = SetupRedirectableProcess(ref processStartInfo, false);
 
             var outputChannel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
             {
@@ -142,6 +157,115 @@ namespace Cysharp.Diagnostics
             process.BeginErrorReadLine();
 
             return new ProcessAsyncEnumerable(process, outputChannel.Reader);
+        }
+
+        public static (Process Process, ProcessAsyncEnumerable StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerable(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+        {
+            var (fileName, arguments) = ParseCommand(command);
+            return GetDualAsyncEnumerable(fileName, arguments, workingDirectory, environmentVariable, encoding);
+        }
+
+        public static (Process Process, ProcessAsyncEnumerable StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerable(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+        {
+            var pi = new ProcessStartInfo()
+            {
+                FileName = fileName,
+                Arguments = arguments,
+            };
+
+            if (workingDirectory != null)
+            {
+                pi.WorkingDirectory = workingDirectory;
+            }
+
+            if (environmentVariable != null)
+            {
+                foreach (var item in environmentVariable)
+                {
+                    pi.EnvironmentVariables.Add(item.Key, item.Value);
+                }
+            }
+
+            if (encoding != null)
+            {
+                pi.StandardOutputEncoding = encoding;
+                pi.StandardErrorEncoding = encoding;
+            }
+
+            return GetDualAsyncEnumerable(pi);
+        }
+
+        public static (Process Process, ProcessAsyncEnumerable StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerable(ProcessStartInfo processStartInfo)
+        {
+            var process = SetupRedirectableProcess(ref processStartInfo, true);
+
+            var outputChannel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = true,
+                AllowSynchronousContinuations = true
+            });
+
+            var errorChannel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = true,
+                AllowSynchronousContinuations = true
+            });
+
+            var waitOutputDataCompleted = new TaskCompletionSource<object?>();
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (e.Data != null)
+                {
+                    outputChannel.Writer.TryWrite(e.Data);
+                }
+                else
+                {
+                    waitOutputDataCompleted.TrySetResult(null);
+                }
+            };
+
+            var waitErrorDataCompleted = new TaskCompletionSource<object?>();
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (e.Data != null)
+                {
+                    errorChannel.Writer.TryWrite(e.Data);
+                }
+                else
+                {
+                    waitErrorDataCompleted.TrySetResult(null);
+                }
+            };
+
+            process.Exited += async (sender, e) =>
+            {
+                await waitErrorDataCompleted.Task.ConfigureAwait(false);
+                await waitOutputDataCompleted.Task.ConfigureAwait(false);
+
+                if (process.ExitCode != 0)
+                {
+                    errorChannel.Writer.TryComplete();
+                    outputChannel.Writer.TryComplete(new ProcessErrorException(process.ExitCode, Array.Empty<string>()));
+                }
+                else
+                {
+                    errorChannel.Writer.TryComplete();
+                    outputChannel.Writer.TryComplete();
+                }
+            };
+
+            if (!process.Start())
+            {
+                throw new InvalidOperationException("Can't start process. FileName:" + processStartInfo.FileName + ", Arguments:" + processStartInfo.Arguments);
+            }
+
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            // error itertor does not handle process itself.
+            return (process, new ProcessAsyncEnumerable(process, outputChannel.Reader), new ProcessAsyncEnumerable(null, errorChannel.Reader));
         }
     }
 }

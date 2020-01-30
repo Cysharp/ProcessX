@@ -10,10 +10,10 @@ namespace Cysharp.Diagnostics
 {
     public class ProcessAsyncEnumerable : IAsyncEnumerable<string>
     {
-        readonly Process process;
+        readonly Process? process;
         readonly ChannelReader<string> channel;
 
-        public ProcessAsyncEnumerable(Process process, ChannelReader<string> channel)
+        internal ProcessAsyncEnumerable(Process? process, ChannelReader<string> channel)
         {
             this.process = process;
             this.channel = channel;

@@ -8,15 +8,16 @@ namespace Cysharp.Diagnostics
 {
     class ProcessAsyncEnumerator : IAsyncEnumerator<string>
     {
-        readonly Process process;
+        readonly Process? process;
         readonly ChannelReader<string> channel;
         readonly CancellationToken cancellationToken;
         readonly CancellationTokenRegistration cancellationTokenRegistration;
         string? current;
         bool disposed;
 
-        public ProcessAsyncEnumerator(Process process, ChannelReader<string> channel, CancellationToken cancellationToken)
+        public ProcessAsyncEnumerator(Process? process, ChannelReader<string> channel, CancellationToken cancellationToken)
         {
+            // process is not null, kill when canceled.
             this.process = process;
             this.channel = channel;
             this.cancellationToken = cancellationToken;
@@ -61,15 +62,21 @@ namespace Cysharp.Diagnostics
                 try
                 {
                     cancellationTokenRegistration.Dispose();
-                    process.EnableRaisingEvents = false;
-                    if (!process.HasExited)
+                    if (process != null)
                     {
-                        process.Kill();
+                        process.EnableRaisingEvents = false;
+                        if (!process.HasExited)
+                        {
+                            process.Kill();
+                        }
                     }
                 }
                 finally
                 {
-                    process.Dispose();
+                    if (process != null)
+                    {
+                        process.Dispose();
+                    }
                 }
             }
 

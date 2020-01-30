@@ -43,7 +43,7 @@ catch (ProcessErrorException ex)
 }
 ```
 
-Reference
+Cancellation
 ---
 to Cancel, you can use `WithCancellation` of IAsyncEnumerable.
 
@@ -66,14 +66,63 @@ using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1)))
 }
 ```
 
+Raw Process/StdError Stream
+---
+In default, when stdError is used, buffering error messages and throws `ProcessErrorException` with error messages after process exited. If you want to use stdError in streaming, you can use `GetDualAsyncEnumerable` method. Also `GetDualAsyncEnumerable` can get raw `Process`, you can use `ProcessID`, `StandardInput` etc.
+
+```csharp
+// first argument is Process, if you want to know ProcessID, use StandardInput, use it.
+var (_, stdOut, stdError) = ProcessX.GetDualAsyncEnumerable("dotnet --foo --bar");
+
+var consumeStdOut = Task.Run(async () =>
+{
+    await foreach (var item in stdOut)
+    {
+        Console.WriteLine("STDOUT: " + item);
+    }
+});
+
+var errorBuffered = new List<string>();
+var consumeStdError = Task.Run(async () =>
+{
+    await foreach (var item in stdError)
+    {
+        Console.WriteLine("STDERROR: " + item);
+        errorBuffered.Add(item);
+    }
+});
+
+try
+{
+    await Task.WhenAll(consumeStdOut, consumeStdError);
+}
+catch (ProcessErrorException ex)
+{
+    // stdout iterator throws exception when exitcode is not 0.
+    Console.WriteLine("ERROR, ExitCode: " + ex.ExitCode);
+
+    // ex.ErrorOutput is empty, if you want to use it, buffer yourself.
+    // Console.WriteLine(string.Join(Environment.NewLine, errorBuffered));
+}
+```
+
+Reference
+---
 `ProcessX.StartAsync` overloads, you can set workingDirectory, environmentVariable, encoding.
 
 ```csharp
+// return ProcessAsyncEnumerable
 StartAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 StartAsync(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 StartAsync(ProcessStartInfo processStartInfo)
 
-Task<string[]> ToTask(CancellationToken cancellationToken = default)
+// return (Process, ProcessAsyncEnumerable, ProcessAsyncEnumerable)
+GetDualAsyncEnumerable(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+GetDualAsyncEnumerable(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+GetDualAsyncEnumerable(ProcessStartInfo processStartInfo)
+
+// return Task<string[]>
+ToTask(CancellationToken cancellationToken = default)
 ```
 
 Competitor
