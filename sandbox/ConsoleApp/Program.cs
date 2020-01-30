@@ -6,15 +6,10 @@ using System.Threading.Tasks;
 
 class Program
 {
+
     static async Task Main(string[] args)
     {
-        using (var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(1)))
-        {
-            await foreach (var item in ProcessX.StartAsync("dotnet --info").WithCancellation(tcs.Token))
-            {
-                Console.WriteLine(item);
-            }
-        }
+        await ProcessX.StartAsync("dotnet --info").WriteLineAllAsync();
 
         //// first argument is Process, if you want to know ProcessID, use StandardInput, use it.
         //var (_, stdOut, stdError) = ProcessX.GetDualAsyncEnumerable("dotnet --foo --bar");

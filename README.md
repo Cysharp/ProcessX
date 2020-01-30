@@ -30,6 +30,9 @@ await foreach (string item in ProcessX.StartAsync("dotnet --info"))
 // receive buffered result(similar as WaitForExit).
 string[] result = await ProcessX.StartAsync("dotnet --info").ToTask();
 
+// like the shell exec, write all data to console.
+await ProcessX.StartAsync("dotnet --info").WriteLineAllAsync();
+
 // when ExitCode is not 0 or StandardError is exists, throws ProcessErrorException
 try
 {
@@ -123,6 +126,9 @@ GetDualAsyncEnumerable(ProcessStartInfo processStartInfo)
 
 // return Task<string[]>
 ToTask(CancellationToken cancellationToken = default)
+
+// return Task
+WriteLineAllAsync(CancellationToken cancellationToken = default)
 ```
 
 Competitor

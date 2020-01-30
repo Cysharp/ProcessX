@@ -33,5 +33,16 @@ namespace Cysharp.Diagnostics
             }
             return list.ToArray();
         }
+
+        /// <summary>
+        /// Write the all received data to console.
+        /// </summary>
+        public async Task WriteLineAllAsync(CancellationToken cancellationToken = default)
+        {
+            await foreach (var item in this.WithCancellation(cancellationToken).ConfigureAwait(false))
+            {
+                Console.WriteLine(item);
+            }
+        }
     }
 }

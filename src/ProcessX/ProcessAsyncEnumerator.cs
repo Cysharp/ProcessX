@@ -43,7 +43,7 @@ namespace Cysharp.Diagnostics
             }
             else
             {
-                if (await channel.WaitToReadAsync(cancellationToken))
+                if (await channel.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     if (channel.TryRead(out current))
                     {
