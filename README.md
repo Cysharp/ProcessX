@@ -48,6 +48,7 @@ Cancellation
 to Cancel, you can use `WithCancellation` of IAsyncEnumerable.
 
 ```csharp
+// when cancel has been called and process still exists, call process kill before exit.
 await foreach (var item in ProcessX.StartAsync("dotnet --info").WithCancellation(cancellationToken))
 {
     Console.WriteLine(item);
