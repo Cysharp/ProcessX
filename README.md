@@ -9,6 +9,15 @@ ProcessX simplifies call an external process with the aync streams in C# 8.0 wit
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Cancellation](#cancellation)
+- [Raw Process/StdError Stream](#raw-processstderror-stream)
+- [Read Binary Data](#read-binary-data)
+- [Reference](#reference)
+- [Competitor](#competitor)
+- [License](#license)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 Getting Started
