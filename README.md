@@ -1,6 +1,7 @@
+[![GitHub Actions](https://github.com/Cysharp/ProcessX/workflows/Build-Debug/badge.svg)](https://github.com/Cysharp/ProcessX/actions) [![Releases](https://img.shields.io/github/release/Cysharp/ProcessX.svg)](https://github.com/Cysharp/ProcessX/releases)
+
 ProcessX
 ===
-[![CircleCI](https://circleci.com/gh/Cysharp/ProcessX.svg?style=svg)](https://circleci.com/gh/Cysharp/ProcessX)
 
 ProcessX simplifies call an external process with the aync streams in C# 8.0 without complex `Process` code. You can receive standard output results by `await foreach`, it is completely asynchronous and realtime.
 
