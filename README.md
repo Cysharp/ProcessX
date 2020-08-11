@@ -6,6 +6,11 @@ ProcessX simplifies call an external process with the aync streams in C# 8.0 wit
 
 ![image](https://user-images.githubusercontent.com/46207/73369038-504f0c80-42f5-11ea-8b36-5c5c979ac882.png)
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Getting Started
 ---
 Install library from NuGet that support from `.NET Standard 2.0`.
