@@ -1,4 +1,4 @@
-[![GitHub Actions](https://github.com/Cysharp/ProcessX/workflows/Build-Debug/badge.svg)](https://github.com/Cysharp/ProcessX/actions) [![Releases](https://img.shields.io/github/release/Cysharp/ProcessX.svg)](https://github.com/Cysharp/ProcessX/releases)
+[![GitHub Actions](https://github.com/Cysharp/ProcessX/workflows/Build-Debug/badge.svg)](https://github.com/Cysharp/ProcessX/actions)
 
 ProcessX
 ===
@@ -132,6 +132,10 @@ If stdout is binary data, you can use `StartReadBinaryAsync` to read `byte[]`.
 ```csharp
 byte[] bin = await ProcessX.StartReadBinaryAsync($"...");
 ```
+
+Change acceptable exit codes
+---
+In default, ExitCode is not 0 throws ProcessErrorException. You can change acceptable exit codes globally by `ProcessX.AcceptableExitCodes` property. Default is `[0]`.
 
 Reference
 ---

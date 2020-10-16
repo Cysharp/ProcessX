@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Channels;
@@ -11,6 +12,13 @@ namespace Cysharp.Diagnostics
 {
     public static class ProcessX
     {
+        public static IReadOnlyList<int> AcceptableExitCodes { get; set; } = new[] { 0 };
+
+        static bool IsInvalidExitCode(Process process)
+        {
+            return !AcceptableExitCodes.Any(x => x == process.ExitCode);
+        }
+
         static (string fileName, string? arguments) ParseCommand(string command)
         {
             var cmdBegin = command.IndexOf(' ');
@@ -132,7 +140,7 @@ namespace Cysharp.Diagnostics
                     await waitOutputDataCompleted.Task.ConfigureAwait(false);
                 }
 
-                if (process.ExitCode != 0)
+                if (IsInvalidExitCode(process))
                 {
                     outputChannel.Writer.TryComplete(new ProcessErrorException(process.ExitCode, errorList.ToArray()));
                 }
@@ -245,7 +253,7 @@ namespace Cysharp.Diagnostics
                 await waitErrorDataCompleted.Task.ConfigureAwait(false);
                 await waitOutputDataCompleted.Task.ConfigureAwait(false);
 
-                if (process.ExitCode != 0)
+                if (IsInvalidExitCode(process))
                 {
                     errorChannel.Writer.TryComplete();
                     outputChannel.Writer.TryComplete(new ProcessErrorException(process.ExitCode, Array.Empty<string>()));
@@ -337,7 +345,7 @@ namespace Cysharp.Diagnostics
             {
                 await waitErrorDataCompleted.Task.ConfigureAwait(false);
 
-                if (errorList.Count == 0 && process.ExitCode == 0)
+                if (errorList.Count == 0 && !IsInvalidExitCode(process))
                 {
                     var resultBin = await readTask.Task.ConfigureAwait(false);
                     if (resultBin != null)
