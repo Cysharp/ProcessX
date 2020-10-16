@@ -15,6 +15,7 @@ ProcessX simplifies call an external process with the aync streams in C# 8.0 wit
 - [Cancellation](#cancellation)
 - [Raw Process/StdError Stream](#raw-processstderror-stream)
 - [Read Binary Data](#read-binary-data)
+- [Change acceptable exit codes](#change-acceptable-exit-codes)
 - [Reference](#reference)
 - [Competitor](#competitor)
 - [License](#license)
