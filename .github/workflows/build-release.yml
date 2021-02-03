@@ -12,13 +12,14 @@ on:
         default: "false"
 
 env:
+  GIT_TAG: ${{ github.event.inputs.tag }}
+  DRY_RUN: ${{ github.event.inputs.dry_run }}
   DOTNET_SDK_VERISON_3: 3.1.x
 
 jobs:
   build-dotnet:
     runs-on: ubuntu-latest
     env:
-      GIT_TAG: ${{ github.event.inputs.tag }}
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
@@ -41,7 +42,6 @@ jobs:
     needs: build-dotnet
     runs-on: ubuntu-latest
     env:
-      GIT_TAG: ${{ github.event.inputs.tag }}
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
@@ -50,18 +50,27 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ env.DOTNET_SDK_VERISON_3 }}
-
+      # tag
+      - uses: actions/checkout@v2
+      - name: tag
+        run: git tag ${{ env.GIT_TAG }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
       # Create Releases
       - uses: actions/create-release@v1
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Ver.${{ github.ref }}
-
+          tag_name: ${{ env.GIT_TAG }}
+          release_name: Ver.${{ env.GIT_TAG }}
+          draft: true
+          prerelease: false
       # Download (All) Artifacts to current directory
       - uses: actions/download-artifact@v2
-
       # Upload to NuGet
       - run: dotnet nuget push "./nuget/*.nupkg" -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
