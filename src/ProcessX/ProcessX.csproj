@@ -5,7 +5,8 @@
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
 
         <!-- NuGet Packaging -->
         <PackageVersion>$(Version)</PackageVersion>
