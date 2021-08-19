@@ -1,68 +1,29 @@
-﻿using Cysharp.Diagnostics; // using namespace
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// ProcessX and C# 9.0 Top level statement; like google/zx.
+// You can execute script by "dotnet run"
 
-class Program
+using Zx;
+
+await $"cat package.json | grep name";
+
+var branch = await "git branch --show-current";
+
+await $"dep deploy --branch={branch}";
+
+// WhenAll
+await new[]
 {
+    new[]{"echo 1" },
+    new[]{"echo 2" },
+    new[]{"echo 3" },
+};
 
-    static async Task Main(string[] args)
-    {
-        var path = @"..\..\..\..\ReturnMessage\ReturnMessage.csproj";
-        await ProcessX.StartAsync($"dotnet run --project {path} -- str -m foo -c 10").WriteLineAllAsync();
+// WhenAll in sequential command.
+await new[]
+{
+    new[]{"sleep 1", "echo 1" },
+    new[]{"sleep 2", "echo 2" },
+    new[]{"sleep 3", "echo 3" },
+};
 
-        //var bin = await ProcessX.StartReadBinaryAsync($"dotnet run --project {path} -- bin -s 999 -c 10 -w 10");
-
-        //// first argument is Process, if you want to know ProcessID, use StandardInput, use it.
-        //var (_, stdOut, stdError) = ProcessX.GetDualAsyncEnumerable("dotnet --foo --bar");
-
-        //var consumeStdOut = Task.Run(async () =>
-        //{
-        //    await foreach (var item in stdOut)
-        //    {
-        //        Console.WriteLine("STDOUT: " + item);
-        //    }
-        //});
-
-        //var errorBuffered = new List<string>();
-        //var consumeStdError = Task.Run(async () =>
-        //{
-        //    await foreach (var item in stdError)
-        //    {
-        //        Console.WriteLine("STDERROR: " + item);
-        //        errorBuffered.Add(item);
-        //    }
-        //});
-
-        //try
-        //{
-        //    await Task.WhenAll(consumeStdOut, consumeStdError);
-        //}
-        //catch (ProcessErrorException ex)
-        //{
-        //    // stdout iterator throws exception when exitcode is not 0.
-        //    Console.WriteLine("ERROR, ExitCode: " + ex.ExitCode);
-
-        //    // ex.ErrorOutput is empty, if you want to use it, buffer yourself.
-        //    // Console.WriteLine(string.Join(Environment.NewLine, errorBuffered));
-        //}
-        //Console.WriteLine(bin.Length);
-
-        Console.WriteLine(IsInvalidExitCode(0));
-        AcceptableExitCodes = new[] { 1 };
-        Console.WriteLine(IsInvalidExitCode(0));
-        Console.WriteLine(IsInvalidExitCode(1));
-        AcceptableExitCodes = new[] { 0, 1 };
-        Console.WriteLine(IsInvalidExitCode(0));
-        Console.WriteLine(IsInvalidExitCode(1));
-    }
-
-    public static IReadOnlyList<int> AcceptableExitCodes { get; set; } = new[] { 0 };
-
-    static bool IsInvalidExitCode(int processExitCode)
-    {
-        return !AcceptableExitCodes.Any(x => x == processExitCode);
-    }
-}
+var name = "foo bar";
+await $"mkdir /foo/{name}";
