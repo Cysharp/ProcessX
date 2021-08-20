@@ -158,9 +158,9 @@ await $"dep deploy --branch={branch}";
 // WhenAll
 await new[]
 {
-    new[]{"echo 1" },
-    new[]{"echo 2" },
-    new[]{"echo 3" },
+    "echo 1",
+    "echo 2",
+    "echo 3",
 };
 
 // WhenAll in sequential command.
@@ -171,8 +171,50 @@ await new[]
     new[]{"sleep 3", "echo 3" },
 };
 
+// you can also use cd(chdir)
+await "cd ../../";
+
 var name = "foo bar";
 await $"mkdir /foo/{name}";
+```
+
+`Zx.Env` has configure property and utility methods, we recommend to use via `using static Zx.Env;`.
+
+```csharp
+using Zx;
+using static Zx.Env;
+
+// Env.verbose, write all stdout log to console. default is true.
+verbose = false;
+
+// Env.shell, default is Windows -> "cmd /c", Linux -> "bash -c";.
+shell = "/bin/sh -c";
+
+// Env.terminateToken, CancellationToken that triggered by SIGTERM(Ctrl + C).
+var token = terminateToken;
+
+// Env.fetch(string requestUri), request HTTP/1, return is HttpResponseMessage.
+var resp = await fetch("http://wttr.in");
+if (resp.IsSuccessStatusCode)
+{
+    Console.WriteLine(await resp.Content.ReadAsStringAsync());
+}
+
+// Env.fetchText(string requestUri), request HTTP/1, return is string.
+var text = await fetchText("http://wttr.in");
+Console.WriteLine(text);
+
+// Env.sleep(int seconds|TimeSpan timeSpan), wrapper of Task.Delay.
+await sleep(5); // wait 5 seconds
+
+// Env.withTimeout(string command, int seconds|TimeSpan timeSpan), execute process with timeout.
+await withTimeout("echo foo", 10);
+
+// Env.withCancellation(string command, CancellationToken cancellationToken), execute process with cancellation.
+await withCancellation("echo foo", terminateToken);
+
+// Env.process(string command), same as `await string` but returns Task<string>.
+var t = process("dotnet info");
 ```
 
 Reference
