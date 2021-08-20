@@ -1,9 +1,22 @@
 ﻿// ProcessX and C# 9.0 Top level statement; like google/zx.
 // You can execute script by "dotnet run"
 
+using System;
 using Zx;
 using static Zx.Env;
 
+log("standard log.");
+log("red log.", ConsoleColor.Red);
+
+using (color(ConsoleColor.Blue))
+{
+    log("blue log");
+    Console.WriteLine("Blue Blue");
+    await "echo blue blue blue";
+}
+
+var bear = await question("What kind of bear is best?");
+System.Console.WriteLine($"You answered: {bear}");
 
 
 

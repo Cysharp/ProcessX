@@ -101,9 +101,37 @@ namespace Zx
             return await ProcessStartAsync(command, cancellationToken);
         }
 
-        public static Task<string> process(string command)
+        public static Task<string> process(string command, CancellationToken cancellationToken = default)
         {
-            return ProcessStartAsync(command, CancellationToken.None);
+            return ProcessStartAsync(command, cancellationToken);
+        }
+
+        public static Task<string> question(string question)
+        {
+            Console.WriteLine(question);
+            return Console.In.ReadLineAsync();
+        }
+
+        public static void log(string value, ConsoleColor? color = default)
+        {
+            if (color != null)
+            {
+                using (Env.color(color.Value))
+                {
+                    Console.WriteLine(value);
+                }
+            }
+            else
+            {
+                Console.WriteLine(value);
+            }
+        }
+
+        public static IDisposable color(ConsoleColor color)
+        {
+            var current = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            return new ColorScope(current);
         }
 
         static async Task<string> ProcessStartAsync(string command, CancellationToken cancellationToken)
@@ -120,6 +148,21 @@ namespace Zx
                 }
             }
             return sb.ToString();
+        }
+
+        class ColorScope : IDisposable
+        {
+            readonly ConsoleColor color;
+
+            public ColorScope(ConsoleColor color)
+            {
+                this.color = color;
+            }
+
+            public void Dispose()
+            {
+                Console.ForegroundColor = color;
+            }
         }
     }
 }

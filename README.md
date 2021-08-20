@@ -141,7 +141,7 @@ In default, ExitCode is not 0 throws ProcessErrorException. You can change accep
 
 Zx
 ---
-like the [google/zx](https://github.com/google/zx), you can write shell script in C#.
+like the [google/zx](https://github.com/google/zx), you can write shell script in C#. `await string` triggers execute process.
 
 ```csharp
 // ProcessX and C# 9.0 Top level statement; like google/zx.
@@ -149,7 +149,7 @@ like the [google/zx](https://github.com/google/zx), you can write shell script i
 
 using Zx;
 
-await $"cat package.json | grep name";
+await "cat package.json | grep name";
 
 var branch = await "git branch --show-current";
 
@@ -193,16 +193,32 @@ shell = "/bin/sh -c";
 // Env.terminateToken, CancellationToken that triggered by SIGTERM(Ctrl + C).
 var token = terminateToken;
 
+// Env.log, same as Console.WriteLine but you can use with ConsoleColor.
+log("standard log.");
+log("red log.", ConsoleColor.Red);
+
+// Env.color, ConsoleColor scope.
+using (color(ConsoleColor.Blue))
+{
+    log("blue log");
+    Console.WriteLine("Blue Blue");
+    await "echo blue blue blue";
+}
+
+// Env.question, Console.WriteLine + Console.ReadLine.
+var bear = await question("What kind of bear is best?");
+log($"You answered: {bear}");
+
 // Env.fetch(string requestUri), request HTTP/1, return is HttpResponseMessage.
 var resp = await fetch("http://wttr.in");
 if (resp.IsSuccessStatusCode)
 {
-    Console.WriteLine(await resp.Content.ReadAsStringAsync());
+    log(await resp.Content.ReadAsStringAsync());
 }
 
 // Env.fetchText(string requestUri), request HTTP/1, return is string.
 var text = await fetchText("http://wttr.in");
-Console.WriteLine(text);
+log(text);
 
 // Env.sleep(int seconds|TimeSpan timeSpan), wrapper of Task.Delay.
 await sleep(5); // wait 5 seconds
