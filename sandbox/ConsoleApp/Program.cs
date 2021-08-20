@@ -2,12 +2,20 @@
 // You can execute script by "dotnet run"
 
 using Zx;
+using static Zx.Env;
 
-await $"cat package.json | grep name";
+
+
+
+await sleep(10);
+
+// await $"cat package.json | grep name";
 
 var branch = await "git branch --show-current";
 
 await $"dep deploy --branch={branch}";
+
+
 
 // WhenAll
 await new[]

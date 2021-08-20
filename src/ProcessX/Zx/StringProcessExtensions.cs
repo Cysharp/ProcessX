@@ -1,5 +1,6 @@
 ﻿using Cysharp.Diagnostics;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -51,23 +52,7 @@ namespace Zx
                 return Task.FromResult("");
             }
 
-            var cmd = command;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                cmd = "cmd /c " + command;
-            }
-            return WriteLineAndReturnString(ProcessX.StartAsync(cmd));
-        }
-
-        static async Task<string> WriteLineAndReturnString(ProcessAsyncEnumerable process)
-        {
-            var sb = new StringBuilder();
-            await foreach (var item in process.ConfigureAwait(false))
-            {
-                sb.AppendLine(item);
-                Console.WriteLine(item);
-            }
-            return sb.ToString();
+            return Env.process(command);
         }
 
         static bool TryChangeDirectory(string command)
