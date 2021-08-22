@@ -1,10 +1,7 @@
-﻿using Cysharp.Diagnostics;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -25,24 +22,6 @@ namespace Zx
             }
 
             return ProcessCommands().GetAwaiter();
-        }
-
-        public static TaskAwaiter GetAwaiter(this string[][] commands)
-        {
-            static async Task ProcessSequential(string[] commands)
-            {
-                foreach (var cmd in commands)
-                {
-                    await ProcessCommand(cmd);
-                }
-            }
-
-            static async Task ProcessParallel(string[][] commands)
-            {
-                await Task.WhenAll(commands.Select(ProcessSequential));
-            }
-
-            return ProcessParallel(commands).GetAwaiter();
         }
 
         static Task<string> ProcessCommand(string command)

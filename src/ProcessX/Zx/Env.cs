@@ -1,6 +1,8 @@
 ﻿using Cysharp.Diagnostics;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,13 +20,13 @@ namespace Zx
             {
                 if (_shell == null)
                 {
-                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         _shell = "cmd /c";
                     }
                     else
                     {
-                        _shell = "bash -c";
+                        _shell = ProcessStartAsync("which bash", CancellationToken.None, forceSilcent: true).Result + " -c";
                     }
                 }
                 return _shell;
@@ -35,25 +37,23 @@ namespace Zx
             }
         }
 
-        static CancellationTokenSource? terminateTokenSource;
-        public static CancellationToken terminateToken
+        static readonly Lazy<CancellationTokenSource> _terminateTokenSource = new Lazy<CancellationTokenSource>(() =>
         {
-            get
-            {
-                if (terminateTokenSource == null)
-                {
-                    terminateTokenSource = new CancellationTokenSource();
-                    Console.CancelKeyPress += Console_CancelKeyPress;
-                }
+            var source = new CancellationTokenSource();
+            Console.CancelKeyPress += (sender, e) => source.Cancel();
+            return source;
+        });
 
-                return terminateTokenSource.Token;
-            }
-        }
+        public static CancellationToken terminateToken => _terminateTokenSource.Value.Token;
 
-        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        public static string? workingDirectory { get; set; }
+
+        static readonly Lazy<IDictionary<string, string>> _envVars = new Lazy<IDictionary<string, string>>(() =>
         {
-            terminateTokenSource?.Cancel();
-        }
+            return new Dictionary<string, string>();
+        });
+
+        public static IDictionary<string, string> envVars => _envVars.Value;
 
         public static Task<HttpResponseMessage> fetch(string requestUri)
         {
@@ -101,18 +101,29 @@ namespace Zx
             return await ProcessStartAsync(command, cancellationToken);
         }
 
+        public static Task<string> run(FormattableString command, CancellationToken cancellationToken = default)
+        {
+            return process(EscapeFormattableString.Escape(command), cancellationToken);
+        }
+
+        public static string escape(FormattableString command)
+        {
+            return EscapeFormattableString.Escape(command);
+        }
+
         public static Task<string> process(string command, CancellationToken cancellationToken = default)
         {
             return ProcessStartAsync(command, cancellationToken);
         }
 
-        public static Task<string> question(string question)
+        public static async Task<string> question(string question)
         {
             Console.WriteLine(question);
-            return Console.In.ReadLineAsync();
+            var str = await Console.In.ReadLineAsync();
+            return str ?? "";
         }
 
-        public static void log(string value, ConsoleColor? color = default)
+        public static void log(object? value, ConsoleColor? color = default)
         {
             if (color != null)
             {
@@ -134,15 +145,15 @@ namespace Zx
             return new ColorScope(current);
         }
 
-        static async Task<string> ProcessStartAsync(string command, CancellationToken cancellationToken)
+        static async Task<string> ProcessStartAsync(string command, CancellationToken cancellationToken, bool forceSilcent = false)
         {
-            var cmd = Env.shell + " " + command;
+            var cmd = shell + " " + command;
             var sb = new StringBuilder();
-            await foreach (var item in ProcessX.StartAsync(cmd).WithCancellation(cancellationToken).ConfigureAwait(false))
+            await foreach (var item in ProcessX.StartAsync(cmd, workingDirectory, envVars).WithCancellation(cancellationToken).ConfigureAwait(false))
             {
                 sb.AppendLine(item);
 
-                if (Env.verbose)
+                if (verbose && !forceSilcent)
                 {
                     Console.WriteLine(item);
                 }

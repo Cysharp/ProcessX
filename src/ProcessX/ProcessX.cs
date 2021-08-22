@@ -76,7 +76,7 @@ namespace Cysharp.Diagnostics
             {
                 foreach (var item in environmentVariable)
                 {
-                    pi.EnvironmentVariables.Add(item.Key, item.Value);
+                    pi.EnvironmentVariables[item.Key] = item.Value;
                 }
             }
 
