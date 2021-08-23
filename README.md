@@ -176,11 +176,11 @@ var dir = "foo/foo bar";
 await run($"mkdir {dir}"); // mkdir "/foo/foo bar"
 
 // helper for Console.WriteLine and colorize
-log("red log.", System.ConsoleColor.Red);
-using (color(System.ConsoleColor.Blue))
+log("red log.", ConsoleColor.Red);
+using (color(ConsoleColor.Blue))
 {
     log("blue log");
-    System.Console.WriteLine("also blue");
+    Console.WriteLine("also blue");
     await run($"echo {"blue blue blue"}");
 }
 
