@@ -7,6 +7,10 @@ ProcessX simplifies call an external process with the aync streams in C# 8.0 wit
 
 ![image](https://user-images.githubusercontent.com/46207/73369038-504f0c80-42f5-11ea-8b36-5c5c979ac882.png)
 
+Also provides zx mode to write shell script in C#, details see [Zx](#zx) section.
+
+![image](https://user-images.githubusercontent.com/46207/130373766-0f16e9ad-57ba-446b-81ee-c255c7149035.png)
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Table of Contents
@@ -141,22 +145,21 @@ In default, ExitCode is not 0 throws ProcessErrorException. You can change accep
 
 Zx
 ---
-like the [google/zx](https://github.com/google/zx), you can write shell script in C#. `await string` triggers execute process.
+like the [google/zx](https://github.com/google/zx), you can write shell script in C#.
 
 ```csharp
 // ProcessX and C# 9.0 Top level statement; like google/zx.
+// You can execute script by "dotnet run"
 
 using Zx;
-using static Zx.Env;
 
-// `await string` execute process like shell
-await "cat package.json | grep name";
+await $"cat package.json | grep name";
 
-// receive result msg of stdout
 var branch = await "git branch --show-current";
+
 await $"dep deploy --branch={branch}";
 
-// parallel request (similar as Task.WhenAll)
+// WhenAll
 await new[]
 {
     "echo 1",
@@ -164,29 +167,19 @@ await new[]
     "echo 3",
 };
 
+// WhenAll in sequential command.
+await new[]
+{
+    new[]{"sleep 1", "echo 1" },
+    new[]{"sleep 2", "echo 2" },
+    new[]{"sleep 3", "echo 3" },
+};
+
 // you can also use cd(chdir)
 await "cd ../../";
 
-// run with $"" automatically escaped and quoted
-var dir = "foo/foo bar";
-await run($"mkdir {dir}"); // mkdir "/foo/foo bar"
-
-// helper for Console.WriteLine and colorize
-log("red log.", ConsoleColor.Red);
-using (color(ConsoleColor.Blue))
-{
-    log("blue log");
-    Console.WriteLine("also blue");
-    await run($"echo {"blue blue blue"}");
-}
-
-// helper for web request
-var text = await fetchText("http://wttr.in");
-log(text);
-
-// helper for ReadLine(stdin)
-var bear = await question("What kind of bear is best?");
-log($"You answered: {bear}");
+var name = "foo bar";
+await $"mkdir /foo/{name}";
 ```
 
 `Zx.Env` has configure property and utility methods, we recommend to use via `using static Zx.Env;`.
@@ -198,44 +191,22 @@ using static Zx.Env;
 // Env.verbose, write all stdout log to console. default is true.
 verbose = false;
 
-// Env.shell, default is Windows -> "cmd /c", Linux -> "{which bash} -c";.
+// Env.shell, default is Windows -> "cmd /c", Linux -> "bash -c";.
 shell = "/bin/sh -c";
 
 // Env.terminateToken, CancellationToken that triggered by SIGTERM(Ctrl + C).
 var token = terminateToken;
 
-// Env.workingDirecoty, set workdir to process start, default is null.
-workingDirectory = ".";
-
-// Env.envVars(`IDictionary<string, string>`), set environment variables to process start.
-envVars["MY-ENV"] = "FOO_BAR_BAZ";
-
-// Env.log, same as Console.WriteLine but you can use with ConsoleColor.
-log("standard log.");
-log("red log.", ConsoleColor.Red);
-
-// Env.color, ConsoleColor scope.
-using (color(ConsoleColor.Blue))
-{
-    log("blue log");
-    Console.WriteLine("Blue Blue");
-    await "echo blue blue blue";
-}
-
-// Env.question, Console.WriteLine + Console.ReadLine.
-var bear = await question("What kind of bear is best?");
-log($"You answered: {bear}");
-
 // Env.fetch(string requestUri), request HTTP/1, return is HttpResponseMessage.
 var resp = await fetch("http://wttr.in");
 if (resp.IsSuccessStatusCode)
 {
-    log(await resp.Content.ReadAsStringAsync());
+    Console.WriteLine(await resp.Content.ReadAsStringAsync());
 }
 
 // Env.fetchText(string requestUri), request HTTP/1, return is string.
 var text = await fetchText("http://wttr.in");
-log(text);
+Console.WriteLine(text);
 
 // Env.sleep(int seconds|TimeSpan timeSpan), wrapper of Task.Delay.
 await sleep(5); // wait 5 seconds
@@ -248,18 +219,7 @@ await withCancellation("echo foo", terminateToken);
 
 // Env.process(string command), same as `await string` but returns Task<string>.
 var t = process("dotnet info");
-
-// Env.run(FormattableString command), simila as `await string` but comamnd is automatically quoted and escaped.
-var dir = "foo/foo bar";
-await run($"mkdir {dir}"); // mkdir "/foo/foo bar"
-
-// Env.escape(FormattableString command), returns quoted string.
-var cmd = Env.escape($"foo {"bar baz"} {"nano sec}"); // foo "bar baz" "nano sec"
 ```
-
-To execute script, Create csproj and single `Program.cs` and use `dotnet run` is simpler way.
-
-If you want to manage multiple script, use out [Cysharp/ConsoleAppFramework](https://github.com/Cysharp/ConsoleAppFramework/) will help it.
 
 Reference
 ---
