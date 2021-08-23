@@ -149,17 +149,18 @@ like the [google/zx](https://github.com/google/zx), you can write shell script i
 
 ```csharp
 // ProcessX and C# 9.0 Top level statement; like google/zx.
-// You can execute script by "dotnet run"
 
 using Zx;
+using static Zx.Env;
 
-await $"cat package.json | grep name";
+// `await string` execute process like shell
+await "cat package.json | grep name";
 
+// receive result msg of stdout
 var branch = await "git branch --show-current";
-
 await $"dep deploy --branch={branch}";
 
-// WhenAll
+// parallel request (similar as Task.WhenAll)
 await new[]
 {
     "echo 1",
@@ -167,19 +168,29 @@ await new[]
     "echo 3",
 };
 
-// WhenAll in sequential command.
-await new[]
-{
-    new[]{"sleep 1", "echo 1" },
-    new[]{"sleep 2", "echo 2" },
-    new[]{"sleep 3", "echo 3" },
-};
-
 // you can also use cd(chdir)
 await "cd ../../";
 
-var name = "foo bar";
-await $"mkdir /foo/{name}";
+// run with $"" automatically escaped and quoted
+var dir = "foo/foo bar";
+await run($"mkdir {dir}"); // mkdir "/foo/foo bar"
+
+// helper for Console.WriteLine and colorize
+log("red log.", System.ConsoleColor.Red);
+using (color(System.ConsoleColor.Blue))
+{
+    log("blue log");
+    System.Console.WriteLine("also blue");
+    await run($"echo {"blue blue blue"}");
+}
+
+// helper for web request
+var text = await fetchText("http://wttr.in");
+log(text);
+
+// helper for ReadLine(stdin)
+var bear = await question("What kind of bear is best?");
+log($"You answered: {bear}");
 ```
 
 writing shell script in C# has advantage over bash/cmd/PowerShell
