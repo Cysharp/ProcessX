@@ -120,7 +120,7 @@ namespace Cysharp.Diagnostics
             {
                 if (e.Data != null)
                 {
-                    lock (errorList)
+                     lock (errorList)
                     {
                         errorList.Add(e.Data);
                     }

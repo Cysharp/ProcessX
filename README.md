@@ -48,6 +48,9 @@ await foreach (string item in ProcessX.StartAsync("dotnet --info"))
     Console.WriteLine(item);
 }
 
+// receive string result from stdout.
+var branch = await ProcessX.StartAsync("git branch --show-current").FirstAsync();
+
 // receive buffered result(similar as WaitForExit).
 string[] result = await ProcessX.StartAsync("dotnet --info").ToTask();
 
@@ -259,6 +262,12 @@ GetDualAsyncEnumerable(ProcessStartInfo processStartInfo)
 StartReadBinaryAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 StartReadBinaryAsync(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 StartReadBinaryAsync(ProcessStartInfo processStartInfo)
+
+// return Task<string>
+FirstAsync(CancellationToken cancellationToken = default)
+
+// return Task<string?>
+FirstOrDefaultAsync(CancellationToken cancellationToken = default)
 
 // return Task<string[]>
 ToTask(CancellationToken cancellationToken = default)

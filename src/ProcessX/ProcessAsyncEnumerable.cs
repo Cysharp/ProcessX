@@ -24,6 +24,30 @@ namespace Cysharp.Diagnostics
             return new ProcessAsyncEnumerator(process, channel, cancellationToken);
         }
 
+        /// <summary>
+        /// Returning first value. If does not return any data, returns empty string.
+        /// </summary>
+        public async Task<string> FirstAsync(CancellationToken cancellationToken = default)
+        {
+            await foreach (var item in this.WithCancellation(cancellationToken).ConfigureAwait(false))
+            {
+                return item;
+            }
+            throw new InvalidOperationException("Process does not return any data.");
+        }
+
+        /// <summary>
+        /// Returning first value or null.
+        /// </summary>
+        public async Task<string?> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+        {
+            await foreach (var item in this.WithCancellation(cancellationToken).ConfigureAwait(false))
+            {
+                return item;
+            }
+            return default;
+        }
+
         public async Task<string[]> ToTask(CancellationToken cancellationToken = default)
         {
             var list = new List<string>();

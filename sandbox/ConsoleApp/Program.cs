@@ -3,8 +3,15 @@
 
 // ProcessX and C# 9.0 Top level statement; like google/zx.
 
+using Cysharp.Diagnostics;
 using Zx;
 using static Zx.Env;
+
+
+
+var s = await ProcessX.StartAsync("git branch --show-current").FirstAsync();
+System.Console.WriteLine(s);
+
 
 // `await string` execute process like shell
 await "cat package.json | grep name";
