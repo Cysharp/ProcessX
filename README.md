@@ -182,6 +182,14 @@ var name = "foo bar";
 await $"mkdir /foo/{name}";
 ```
 
+writing shell script in C# has advantage over bash/cmd/PowerShell
+
+* Static typed
+* async/await
+* Code formatter
+* Clean syntax via C#
+* Powerful editor environment(Visual Studio/Code/Rider)
+
 `Zx.Env` has configure property and utility methods, we recommend to use via `using static Zx.Env;`.
 
 ```csharp
