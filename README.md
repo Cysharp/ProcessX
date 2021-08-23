@@ -49,13 +49,16 @@ await foreach (string item in ProcessX.StartAsync("dotnet --info"))
 }
 
 // receive string result from stdout.
-var branch = await ProcessX.StartAsync("git branch --show-current").FirstAsync();
+var version = await ProcessX.StartAsync("dotnet --version").FirstAsync();
 
 // receive buffered result(similar as WaitForExit).
 string[] result = await ProcessX.StartAsync("dotnet --info").ToTask();
 
 // like the shell exec, write all data to console.
 await ProcessX.StartAsync("dotnet --info").WriteLineAllAsync();
+
+// consume all result and wait complete asynchronously(useful to use no result process).
+await ProcessX.StartAsync("cmd /c mkdir foo").WaitAsync();
 
 // when ExitCode is not 0 or StandardError is exists, throws ProcessErrorException
 try
@@ -268,6 +271,9 @@ FirstAsync(CancellationToken cancellationToken = default)
 
 // return Task<string?>
 FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+
+// return Task
+WaitAsync(CancellationToken cancellationToken = default)
 
 // return Task<string[]>
 ToTask(CancellationToken cancellationToken = default)

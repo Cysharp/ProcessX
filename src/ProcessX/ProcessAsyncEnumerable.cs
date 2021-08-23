@@ -25,6 +25,16 @@ namespace Cysharp.Diagnostics
         }
 
         /// <summary>
+        /// Consume all result and wait complete asynchronously.
+        /// </summary>
+        public async Task WaitAsync(CancellationToken cancellationToken = default)
+        {
+            await foreach (var _ in this.WithCancellation(cancellationToken).ConfigureAwait(false))
+            {
+            }
+        }
+
+        /// <summary>
         /// Returning first value. If does not return any data, returns empty string.
         /// </summary>
         public async Task<string> FirstAsync(CancellationToken cancellationToken = default)

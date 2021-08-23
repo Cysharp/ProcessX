@@ -9,8 +9,10 @@ using static Zx.Env;
 
 
 
-var s = await ProcessX.StartAsync("git branch --show-current").FirstAsync();
-System.Console.WriteLine(s);
+await ProcessX.StartAsync("cmd /c mkdir foo").WaitAsync();
+
+return;
+
 
 
 // `await string` execute process like shell
