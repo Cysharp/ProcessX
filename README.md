@@ -164,7 +164,7 @@ await "cat package.json | grep name";
 
 // receive result msg of stdout
 var branch = await "git branch --show-current";
-await run($"dep deploy --branch={branch}");
+await $"dep deploy --branch={branch}";
 
 // parallel request (similar as Task.WhenAll)
 await new[]
