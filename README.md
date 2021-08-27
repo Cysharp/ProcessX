@@ -164,7 +164,7 @@ await "cat package.json | grep name";
 
 // receive result msg of stdout
 var branch = await "git branch --show-current";
-await $"dep deploy --branch={branch}";
+await run($"dep deploy --branch={branch}");
 
 // parallel request (similar as Task.WhenAll)
 await new[]
@@ -213,10 +213,10 @@ writing shell script in C# has advantage over bash/cmd/PowerShell
 using Zx;
 using static Zx.Env;
 
-// Env.verbose, write all stdout log to console. default is true.
+// Env.verbose, write all stdout/stderror log to console. default is true.
 verbose = false;
 
-// Env.shell, default is Windows -> "cmd /c", Linux -> "bash -c";.
+// Env.shell, default is Windows -> "cmd /c", Linux -> "(which bash) -c";.
 shell = "/bin/sh -c";
 
 // Env.terminateToken, CancellationToken that triggered by SIGTERM(Ctrl + C).
@@ -236,15 +236,29 @@ Console.WriteLine(text);
 // Env.sleep(int seconds|TimeSpan timeSpan), wrapper of Task.Delay.
 await sleep(5); // wait 5 seconds
 
-// Env.withTimeout(string command, int seconds|TimeSpan timeSpan), execute process with timeout.
-await withTimeout("echo foo", 10);
+// Env.withTimeout(string command, int seconds|TimeSpan timeSpan), execute process with timeout. Require to use with "$".
+await withTimeout($"echo foo", 10);
 
-// Env.withCancellation(string command, CancellationToken cancellationToken), execute process with cancellation.
-await withCancellation("echo foo", terminateToken);
+// Env.withCancellation(string command, CancellationToken cancellationToken), execute process with cancellation. Require to use with "$".
+await withCancellation($"echo foo", terminateToken);
+
+// Env.run(FormattableString), automatically escaped and quoted. argument string requires to use with "$"
+await run($"mkdir {dir}");
 
 // Env.process(string command), same as `await string` but returns Task<string>.
 var t = process("dotnet info");
+
+// Env.ignore(Task), ignore ProcessErrorException
+await ignore(run($"dotnet noinfo"));
+
+// ***2 receives tuple of result (StdOut, StdError).
+var (stdout, stderror) = run2($"");
+var (stdout, stderror) = withTimeout2($"");
+var (stdout, stderror) = withCancellation2($"");
+var (stdout, stderror) = process2($"");
 ```
+
+`await string` does not escape argument so recommend to use `run($"string")` when use with argument.
 
 Reference
 ---
@@ -266,10 +280,10 @@ StartReadBinaryAsync(string command, string? workingDirectory = null, IDictionar
 StartReadBinaryAsync(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
 StartReadBinaryAsync(ProcessStartInfo processStartInfo)
 
-// return Task<string>
+// return Task<string> ;get the first result(if empty, throws exception) and wait completed
 FirstAsync(CancellationToken cancellationToken = default)
 
-// return Task<string?>
+// return Task<string?> ;get the first result(if empty, returns null) and wait completed
 FirstOrDefaultAsync(CancellationToken cancellationToken = default)
 
 // return Task

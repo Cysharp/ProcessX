@@ -4,23 +4,19 @@
 // ProcessX and C# 9.0 Top level statement; like google/zx.
 
 using Cysharp.Diagnostics;
+using System.Runtime.CompilerServices;
 using Zx;
 using static Zx.Env;
 
 
 
-await ProcessX.StartAsync("cmd /c mkdir foo").WaitAsync();
-
-return;
-
-
 
 // `await string` execute process like shell
-await "cat package.json | grep name";
+//await "cat package.json | grep name";
 
 // receive result msg of stdout
 var branch = await "git branch --show-current";
-await $"dep deploy --branch={branch}";
+//await $"dep deploy --branch={branch}";
 
 // parallel request (similar as Task.WhenAll)
 await new[]
@@ -56,6 +52,7 @@ log($"You answered: {bear}");
 
 
 
+await ignore(run($"dotnet noinfo"));
 
 
 
