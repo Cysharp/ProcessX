@@ -41,7 +41,10 @@ namespace Cysharp.Diagnostics
             string? data = null;
             await foreach (var item in this.WithCancellation(cancellationToken).ConfigureAwait(false))
             {
-                data = (item ?? "");
+                if (data == null)
+                {
+                    data = (item ?? "");
+                }
             }
 
             if (data == null)
@@ -62,7 +65,10 @@ namespace Cysharp.Diagnostics
             string? data = null;
             await foreach (var item in this.WithCancellation(cancellationToken).ConfigureAwait(false))
             {
-                data = (item ?? "");
+                if (data == null)
+                {
+                    data = (item ?? "");
+                }
             }
             return data;
         }

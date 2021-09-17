@@ -198,9 +198,19 @@ namespace Zx
 
             var runStdout = Task.Run(async () =>
             {
+                var isFirst = true;
                 await foreach (var item in stdout.WithCancellation(cancellationToken).ConfigureAwait(false))
                 {
-                    sbOut.AppendLine(item);
+                    if (!isFirst)
+                    {
+                        sbOut.AppendLine();
+                    }
+                    else
+                    {
+                        isFirst = false;
+                    }
+
+                    sbOut.Append(item);
 
                     if (verbose && !forceSilcent)
                     {
@@ -211,9 +221,18 @@ namespace Zx
 
             var runStdError = Task.Run(async () =>
             {
+                var isFirst = true;
                 await foreach (var item in stderror.WithCancellation(cancellationToken).ConfigureAwait(false))
                 {
-                    sbError.AppendLine(item);
+                    if (!isFirst)
+                    {
+                        sbOut.AppendLine();
+                    }
+                    else
+                    {
+                        isFirst = false;
+                    }
+                    sbError.Append(item);
 
                     if (verbose && !forceSilcent)
                     {

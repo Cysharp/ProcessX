@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using Zx;
 using static Zx.Env;
 
-
+var version = await "dotnet --version";
 
 
 // `await string` execute process like shell
