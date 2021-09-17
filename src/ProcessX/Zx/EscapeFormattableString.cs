@@ -17,13 +17,8 @@ namespace Zx
 
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i] is string s)
+                if (args[i] is string)
                 {
-                    if (!s.Contains(" "))
-                    {
-                        continue; // no need for escape
-                    }
-
                     args[i] = "\"" + args[i].ToString().Replace("\"", "\\\"") + "\""; // poor logic
                 }
             }
