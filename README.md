@@ -260,6 +260,8 @@ var (stdout, stderror) = process2($"");
 
 `await string` does not escape argument so recommend to use `run($"string")` when use with argument.
 
+If you want to more colorize like Chalk on JavaScript, [Kokuban](https://github.com/mayuki/Kokuban) styler for .NET Console app will help.
+
 Reference
 ---
 `ProcessX.StartAsync` overloads, you can set workingDirectory, environmentVariable, encoding.
@@ -300,6 +302,7 @@ Competitor
 ---
 * [Tyrrrz/CliWrap](https://github.com/Tyrrrz/CliWrap) - Wrapper for command line interfaces.
 * [jamesmanning/RunProcessAsTask](https://github.com/jamesmanning/RunProcessAsTask) - Simple wrapper around System.Diagnostics.Process to expose it as a System.Threading.Tasks.Task.
+* [mayuki/Chell](https://github.com/mayuki/Chell) Write scripts with the power of C# and .NET.
 
 License
 ---
