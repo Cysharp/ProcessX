@@ -260,7 +260,7 @@ var (stdout, stderror) = process2($"");
 
 `await string` does not escape argument so recommend to use `run($"string")` when use with argument.
 
-If you want to more colorize like Chalk on JavaScript, [Kokuban](https://github.com/mayuki/Kokuban) styler for .NET Console app will help.
+If you want to more colorize like Chalk on JavaScript, [Cysharp/Kokuban](https://github.com/Cysharp/Kokuban) styler for .NET ConsoleApp will help.
 
 Reference
 ---
