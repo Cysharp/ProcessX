@@ -197,6 +197,10 @@ log(text);
 // helper for ReadLine(stdin)
 var bear = await question("What kind of bear is best?");
 log($"You answered: {bear}");
+
+// run has some variant(run2, runl, withTimeout, withCancellation)
+// runl returns string[](runlist -> runl)
+var sdks = await runl($"dotnet --list-sdks");
 ```
 
 writing shell script in C# has advantage over bash/cmd/PowerShell
@@ -245,17 +249,28 @@ await withCancellation($"echo foo", terminateToken);
 // Env.run(FormattableString), automatically escaped and quoted. argument string requires to use with "$"
 await run($"mkdir {dir}");
 
+// Env.run(FormattableString), automatically escaped and quoted. argument string requires to use with "$"
+await run($"mkdir {dir}");
+
+// Env.runl(FormattableString), returns string[], automatically escaped and quoted. argument string requires to use with "$"
+var l1 = runl("dotnet --list-sdks");
+
 // Env.process(string command), same as `await string` but returns Task<string>.
 var t = process("dotnet info");
+
+// Env.processl(string command), returns Task<string[]>.
+var l2 = processl("dotnet --list-sdks");
 
 // Env.ignore(Task), ignore ProcessErrorException
 await ignore(run($"dotnet noinfo"));
 
 // ***2 receives tuple of result (StdOut, StdError).
 var (stdout, stderror) = run2($"");
+var (stdout, stderror) = runl2($"");
 var (stdout, stderror) = withTimeout2($"");
 var (stdout, stderror) = withCancellation2($"");
 var (stdout, stderror) = process2($"");
+var (stdout, stderror) = processl2($"");
 ```
 
 `await string` does not escape argument so recommend to use `run($"string")` when use with argument.

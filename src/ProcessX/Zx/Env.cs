@@ -132,6 +132,16 @@ namespace Zx
             return process2(EscapeFormattableString.Escape(command), cancellationToken);
         }
 
+        public static Task<string[]> runl(FormattableString command, CancellationToken cancellationToken = default)
+        {
+            return processl(EscapeFormattableString.Escape(command), cancellationToken);
+        }
+
+        public static Task<(string[] StdOut, string[] StdError)> runl2(FormattableString command, CancellationToken cancellationToken = default)
+        {
+            return processl2(EscapeFormattableString.Escape(command), cancellationToken);
+        }
+
         public static string escape(FormattableString command)
         {
             return EscapeFormattableString.Escape(command);
@@ -145,6 +155,16 @@ namespace Zx
         public static async Task<(string StdOut, string StdError)> process2(string command, CancellationToken cancellationToken = default)
         {
             return await ProcessStartAsync(command, cancellationToken);
+        }
+
+        public static async Task<string[]> processl(string command, CancellationToken cancellationToken = default)
+        {
+            return (await ProcessStartListAsync(command, cancellationToken)).StdOut;
+        }
+
+        public static async Task<(string[] StdOut, string[] StdError)> processl2(string command, CancellationToken cancellationToken = default)
+        {
+            return await ProcessStartListAsync(command, cancellationToken);
         }
 
         public static async Task<T> ignore<T>(Task<T> task)
@@ -244,6 +264,45 @@ namespace Zx
             await Task.WhenAll(runStdout, runStdError).ConfigureAwait(false);
 
             return (sbOut.ToString(), sbError.ToString());
+        }
+
+        static async Task<(string[] StdOut, string[] StdError)> ProcessStartListAsync(string command, CancellationToken cancellationToken, bool forceSilcent = false)
+        {
+            var cmd = shell + " " + command;
+            var sbOut = new List<string>();
+            var sbError = new List<string>();
+
+            var (_, stdout, stderror) = ProcessX.GetDualAsyncEnumerable(cmd, workingDirectory, envVars);
+
+            var runStdout = Task.Run(async () =>
+            {
+                await foreach (var item in stdout.WithCancellation(cancellationToken).ConfigureAwait(false))
+                {
+                    sbOut.Add(item);
+
+                    if (verbose && !forceSilcent)
+                    {
+                        Console.WriteLine(item);
+                    }
+                }
+            });
+
+            var runStdError = Task.Run(async () =>
+            {
+                await foreach (var item in stderror.WithCancellation(cancellationToken).ConfigureAwait(false))
+                {
+                    sbError.Add(item);
+
+                    if (verbose && !forceSilcent)
+                    {
+                        Console.WriteLine(item);
+                    }
+                }
+            });
+
+            await Task.WhenAll(runStdout, runStdError).ConfigureAwait(false);
+
+            return (sbOut.ToArray(), sbError.ToArray());
         }
 
         class ColorScope : IDisposable

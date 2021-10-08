@@ -14,6 +14,8 @@ var version = await "dotnet --version";
 // `await string` execute process like shell
 //await "cat package.json | grep name";
 
+var lst = await runl($"dotnet --list-sdks");
+
 // receive result msg of stdout
 var branch = await "git branch --show-current";
 //await $"dep deploy --branch={branch}";
@@ -21,10 +23,10 @@ var branch = await "git branch --show-current";
 // parallel request (similar as Task.WhenAll)
 await new[]
 {
-        "echo 1",
-        "echo 2",
-        "echo 3",
-    };
+    "echo 1",
+    "echo 2",
+    "echo 3",
+};
 
 // you can also use cd(chdir)
 await "cd ../../";
