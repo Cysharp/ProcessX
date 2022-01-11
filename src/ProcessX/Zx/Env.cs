@@ -26,7 +26,14 @@ namespace Zx
                     }
                     else
                     {
-                        _shell = ProcessStartAsync("which bash", CancellationToken.None, forceSilcent: true).Result + " -c";
+                        if (Which.TryGetPath("bash", out var bashPath))
+                        {
+                            _shell = bashPath + " -c";
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("shell is not found in PATH, set Env.shell manually.");
+                        }
                     }
                 }
                 return _shell;
@@ -210,11 +217,11 @@ namespace Zx
 
         static async Task<(string StdOut, string StdError)> ProcessStartAsync(string command, CancellationToken cancellationToken, bool forceSilcent = false)
         {
-            var cmd = shell + " " + command;
+            var cmd = shell + " \"" + command + "\"";
             var sbOut = new StringBuilder();
             var sbError = new StringBuilder();
 
-            var (_, stdout, stderror) = ProcessX.GetDualAsyncEnumerable(cmd, workingDirectory, envVars);
+            var (_, stdout, stderror) = Cysharp.Diagnostics.ProcessX.GetDualAsyncEnumerable(cmd, workingDirectory, envVars);
 
             var runStdout = Task.Run(async () =>
             {
@@ -268,11 +275,11 @@ namespace Zx
 
         static async Task<(string[] StdOut, string[] StdError)> ProcessStartListAsync(string command, CancellationToken cancellationToken, bool forceSilcent = false)
         {
-            var cmd = shell + " " + command;
+            var cmd = shell + " \"" + command + "\"";
             var sbOut = new List<string>();
             var sbError = new List<string>();
 
-            var (_, stdout, stderror) = ProcessX.GetDualAsyncEnumerable(cmd, workingDirectory, envVars);
+            var (_, stdout, stderror) = Cysharp.Diagnostics.ProcessX.GetDualAsyncEnumerable(cmd, workingDirectory, envVars);
 
             var runStdout = Task.Run(async () =>
             {
