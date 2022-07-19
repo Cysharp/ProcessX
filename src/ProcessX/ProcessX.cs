@@ -103,24 +103,27 @@ namespace Cysharp.Diagnostics
             var errorList = new List<string>();
 
             var waitOutputDataCompleted = new TaskCompletionSource<object?>();
-            process.OutputDataReceived += (sender, e) =>
+
+            void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
             {
                 if (e.Data != null)
                 {
-                    outputChannel.Writer.TryWrite(e.Data);
+                    outputChannel?.Writer.TryWrite(e.Data);
                 }
                 else
                 {
-                    waitOutputDataCompleted.TrySetResult(null);
+                    waitOutputDataCompleted?.TrySetResult(null);
                 }
-            };
+            }
+
+            process.OutputDataReceived += OnOutputDataReceived;
 
             var waitErrorDataCompleted = new TaskCompletionSource<object?>();
             process.ErrorDataReceived += (sender, e) =>
             {
                 if (e.Data != null)
                 {
-                     lock (errorList)
+                    lock (errorList)
                     {
                         errorList.Add(e.Data);
                     }
@@ -138,6 +141,10 @@ namespace Cysharp.Diagnostics
                 if (errorList.Count == 0)
                 {
                     await waitOutputDataCompleted.Task.ConfigureAwait(false);
+                }
+                else
+                {
+                    process.OutputDataReceived -= OnOutputDataReceived;
                 }
 
                 if (IsInvalidExitCode(process))
