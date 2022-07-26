@@ -19,6 +19,7 @@ env:
 jobs:
   build-dotnet:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
@@ -40,6 +41,7 @@ jobs:
     if: github.event.inputs.dry-run == 'false'
     needs: build-dotnet
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       # tag
