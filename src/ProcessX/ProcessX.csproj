@@ -19,6 +19,7 @@
         <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
