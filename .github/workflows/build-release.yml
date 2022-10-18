@@ -45,6 +45,7 @@ jobs:
     steps:
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       # tag
+      - uses: actions/checkout@v3
       - name: tag
         run: git tag ${{ env.GIT_TAG }}
       - name: Push changes
