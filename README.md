@@ -276,8 +276,6 @@ var (stdout, stderror) = process2($"");
 var (stdout, stderror) = processl2($"");
 ```
 
-Here's the English translation:
-
 By default (useShell == true), commands are executed through the shell. This means that `dotnet --version` is actually converted to something like `"cmd /c \"dotnet --version\""` during execution. When strings contain spaces, they need to be escaped, but please note that escape handling differs depending on the shell (cmd, bash, pwsh, etc.). If you want to avoid execution through the shell, you can set `Env.useShell = false`, which will result in more intuitive execution.
 
 ```csharp
