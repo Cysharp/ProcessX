@@ -8,7 +8,8 @@ using System.Runtime.CompilerServices;
 using Zx;
 using static Zx.Env;
 
-await "dotnet add --help";
+useShell = false;
+await "dotnet --version";
 
 //// `await string` execute process like shell
 ////await "cat package.json | grep name";

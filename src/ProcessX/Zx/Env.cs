@@ -44,6 +44,8 @@ namespace Zx
             }
         }
 
+        public static bool useShell { get; set; } = true;
+
         static readonly Lazy<CancellationTokenSource> _terminateTokenSource = new Lazy<CancellationTokenSource>(() =>
         {
             var source = new CancellationTokenSource();
@@ -217,7 +219,9 @@ namespace Zx
 
         static async Task<(string StdOut, string StdError)> ProcessStartAsync(string command, CancellationToken cancellationToken, bool forceSilcent = false)
         {
-            var cmd = shell + " \"" + command + "\"";
+            var cmd = useShell
+                ? shell + " \"" + command + "\""
+                : command;
             var sbOut = new StringBuilder();
             var sbError = new StringBuilder();
 
