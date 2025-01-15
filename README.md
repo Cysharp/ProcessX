@@ -220,6 +220,9 @@ using static Zx.Env;
 // Env.verbose, write all stdout/stderror log to console. default is true.
 verbose = false;
 
+// Env.useShell, default is true; which invoke process by `cmd/bash "command argment..."`.
+useShell = true;
+
 // Env.shell, default is Windows -> "cmd /c", Linux -> "(which bash) -c";.
 shell = "/bin/sh -c";
 
@@ -273,7 +276,17 @@ var (stdout, stderror) = process2($"");
 var (stdout, stderror) = processl2($"");
 ```
 
-`await string` does not escape argument so recommend to use `run($"string")` when use with argument.
+By default (useShell == true), commands are executed through the shell. This means that `dotnet --version` is actually converted to something like `"cmd /c \"dotnet --version\""` during execution. When strings contain spaces, they need to be escaped, but please note that escape handling differs depending on the shell (cmd, bash, pwsh, etc.). If you want to avoid execution through the shell, you can set `Env.useShell = false`, which will result in more intuitive execution.
+
+```csharp
+using Zx;
+using static Zx.Env;
+
+useShell = false;
+await "dotnet --version";
+```
+
+If you want to escape the arguments, you can also use `run($"string")`.
 
 If you want to more colorize like Chalk on JavaScript, [Cysharp/Kokuban](https://github.com/Cysharp/Kokuban) styler for .NET ConsoleApp will help.
 
