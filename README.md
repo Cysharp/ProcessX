@@ -145,6 +145,8 @@ If stdout is binary data, you can use `StartReadBinaryAsync` to read `byte[]`.
 byte[] bin = await ProcessX.StartReadBinaryAsync($"...");
 ```
 
+For applications that send messages to Standard Error output like ffmpeg, use `StartReadBinaryWithErrOutAsync` to get both the stdout as `byte[]` and stderr as `List<string>`.
+
 Change acceptable exit codes
 ---
 In default, ExitCode is not 0 throws ProcessErrorException. You can change acceptable exit codes globally by `ProcessX.AcceptableExitCodes` property. Default is `[0]`.
