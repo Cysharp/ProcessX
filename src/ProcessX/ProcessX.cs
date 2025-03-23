@@ -380,13 +380,13 @@ namespace Cysharp.Diagnostics
 
         // Binary with Error Output
 
-        public static Task<(byte[] StdOut, List<string> ErrOut)> StartReadBinaryWithErrOutAsync(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+        public static (Task<byte[]> StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerableBinary(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
         {
             var (fileName, arguments) = ParseCommand(command);
-            return StartReadBinaryWithErrOutAsync(fileName, arguments, workingDirectory, environmentVariable, encoding);
+            return GetDualAsyncEnumerableBinary(fileName, arguments, workingDirectory, environmentVariable, encoding);
         }
 
-        public static Task<(byte[] StdOut, List<string> ErrOut)> StartReadBinaryWithErrOutAsync(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+        public static (Task<byte[]> StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerableBinary(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
         {
             var pi = new ProcessStartInfo()
             {
@@ -413,17 +413,22 @@ namespace Cysharp.Diagnostics
                 pi.StandardErrorEncoding = encoding;
             }
 
-            return StartReadBinaryWithErrOutAsync(pi);
+            return GetDualAsyncEnumerableBinary(pi);
         }
 
-        public static Task<(byte[] StdOut, List<string> ErrOut)> StartReadBinaryWithErrOutAsync(ProcessStartInfo processStartInfo)
+        public static (Task<byte[]> StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerableBinary(ProcessStartInfo processStartInfo)
         {
             var process = SetupRedirectableProcess(ref processStartInfo, false);
 
-            var errorList = new List<string>();
+            var errorChannel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = true,
+                AllowSynchronousContinuations = true
+            });
 
             var cts = new CancellationTokenSource();
-            var resultTask = new TaskCompletionSource<(byte[] StdOut, List<string> ErrOut)>();
+            var resultTask = new TaskCompletionSource<byte[]>();
             var readTask = new TaskCompletionSource<byte[]?>();
 
             var waitErrorDataCompleted = new TaskCompletionSource<object?>();
@@ -431,10 +436,7 @@ namespace Cysharp.Diagnostics
             {
                 if (e.Data != null)
                 {
-                    lock (errorList)
-                    {
-                        errorList.Add(e.Data);
-                    }
+                    errorChannel.Writer.TryWrite(e.Data);
                 }
                 else
                 {
@@ -445,20 +447,20 @@ namespace Cysharp.Diagnostics
             process.Exited += async (sender, e) =>
             {
                 await waitErrorDataCompleted.Task.ConfigureAwait(false);
+                errorChannel.Writer.TryComplete();
 
                 if (!IsInvalidExitCode(process))
                 {
                     var resultBin = await readTask.Task.ConfigureAwait(false);
                     if (resultBin != null)
                     {
-                        resultTask.TrySetResult((resultBin, errorList));
+                        resultTask.TrySetResult(resultBin);
                         return;
                     }
                 }
 
                 cts.Cancel();
-
-                resultTask.TrySetException(new ProcessErrorException(process.ExitCode, errorList.ToArray()));
+                resultTask.TrySetException(new ProcessErrorException(process.ExitCode, Array.Empty<string>()));
             };
 
             if (!process.Start())
@@ -469,7 +471,7 @@ namespace Cysharp.Diagnostics
             RunAsyncReadFully(process.StandardOutput.BaseStream, readTask, cts.Token);
             process.BeginErrorReadLine();
 
-            return resultTask.Task;
+            return (resultTask.Task, new ProcessAsyncEnumerable(null, errorChannel.Reader));
         }
 
         static async void RunAsyncReadFully(Stream stream, TaskCompletionSource<byte[]?> completion, CancellationToken cancellationToken)

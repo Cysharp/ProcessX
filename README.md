@@ -137,6 +137,9 @@ catch (ProcessErrorException ex)
 }
 ```
 
+If stdout is binary data, you can use `GetDualAsyncEnumerableBinary`.
+
+
 Read Binary Data
 ---
 If stdout is binary data, you can use `StartReadBinaryAsync` to read `byte[]`.
@@ -144,8 +147,6 @@ If stdout is binary data, you can use `StartReadBinaryAsync` to read `byte[]`.
 ```csharp
 byte[] bin = await ProcessX.StartReadBinaryAsync($"...");
 ```
-
-For applications that send messages to Standard Error output like ffmpeg, use `StartReadBinaryWithErrOutAsync` to get both the stdout as `byte[]` and stderr as `List<string>`.
 
 Change acceptable exit codes
 ---

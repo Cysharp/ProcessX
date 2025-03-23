@@ -4,7 +4,7 @@ using Cysharp.Diagnostics;
 
 var ffmpeg = @"D:\apps\ffmpeg\bin\ffmpeg.exe";
 var inputFile = @"d:\temp\Zoom.mp4";
-var command = $"{ffmpeg} -i {inputFile} -c:v libx264 -crf 60 -f mpegts -";
+var command = $"{ffmpeg} -y -i {inputFile} -c:v libx264 -crf 70 -f mpegts -";
 
 // throws with ExitCode 0
 if (false)
@@ -14,14 +14,50 @@ if (false)
 // returns stdout (mp4) and stderr (messages)
 else if (false)
 {
-    var r = await ProcessX.StartReadBinaryWithErrOutAsync(command);
-    File.WriteAllBytes($"{inputFile}.out.mp4", r.StdOut);
+    var (bytesTask, errorsTask) = ProcessX.GetDualAsyncEnumerableBinary(command);
+
+    var bytes = new byte[1];
+    var consumeStdOut = Task.Run(async () => bytes = await bytesTask);
+
+    // get messages from stderr
+    var errorBuffered = new List<string>();
+    var consumeStdError = Task.Run(async () =>
+    {
+        await foreach (var item in errorsTask)
+        {
+            Console.WriteLine("STDERROR: " + item);
+            errorBuffered.Add(item);
+        }
+    });
+
+    await Task.WhenAll(consumeStdOut, consumeStdError);
+
+    File.WriteAllBytes($"{inputFile}.out.mp4", bytes);
 }
 // throws with ExitCode -22
 else if (true)
 {
-    var r2 = await ProcessX.StartReadBinaryWithErrOutAsync(command.Replace("mpegts", "mp4", StringComparison.InvariantCulture));
-    File.WriteAllBytes($"{inputFile}.out.mp4", r2.StdOut);
+    var (bytesTask, errorsTask) = ProcessX.GetDualAsyncEnumerableBinary(command.Replace("mpegts", "mp4", StringComparison.InvariantCulture));
+
+    // get messages from stderr
+    var errorBuffered = new List<string>();
+    var consumeStdError = Task.Run(async () =>
+    {
+        await foreach (var item in errorsTask)
+        {
+            errorBuffered.Add(item);
+        }
+    });
+
+    try
+    {
+        await Task.WhenAll(bytesTask, consumeStdError);
+    }
+    catch (ProcessErrorException ex)
+    {
+        Console.WriteLine("ERROR, ExitCode: " + ex.ExitCode);
+        Console.WriteLine(string.Join(Environment.NewLine, errorBuffered));
+    }
 }
 
 Console.ReadLine();
