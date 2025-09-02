@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -376,6 +376,102 @@ namespace Cysharp.Diagnostics
             process.BeginErrorReadLine();
 
             return resultTask.Task;
+        }
+
+        // Binary with Error Output
+
+        public static (Task<byte[]> StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerableBinary(string command, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+        {
+            var (fileName, arguments) = ParseCommand(command);
+            return GetDualAsyncEnumerableBinary(fileName, arguments, workingDirectory, environmentVariable, encoding);
+        }
+
+        public static (Task<byte[]> StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerableBinary(string fileName, string? arguments, string? workingDirectory = null, IDictionary<string, string>? environmentVariable = null, Encoding? encoding = null)
+        {
+            var pi = new ProcessStartInfo()
+            {
+                FileName = fileName,
+                Arguments = arguments,
+            };
+
+            if (workingDirectory != null)
+            {
+                pi.WorkingDirectory = workingDirectory;
+            }
+
+            if (environmentVariable != null)
+            {
+                foreach (var item in environmentVariable)
+                {
+                    pi.EnvironmentVariables.Add(item.Key, item.Value);
+                }
+            }
+
+            if (encoding != null)
+            {
+                pi.StandardOutputEncoding = encoding;
+                pi.StandardErrorEncoding = encoding;
+            }
+
+            return GetDualAsyncEnumerableBinary(pi);
+        }
+
+        public static (Task<byte[]> StdOut, ProcessAsyncEnumerable StdError) GetDualAsyncEnumerableBinary(ProcessStartInfo processStartInfo)
+        {
+            var process = SetupRedirectableProcess(ref processStartInfo, false);
+
+            var errorChannel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = true,
+                AllowSynchronousContinuations = true
+            });
+
+            var cts = new CancellationTokenSource();
+            var resultTask = new TaskCompletionSource<byte[]>();
+            var readTask = new TaskCompletionSource<byte[]?>();
+
+            var waitErrorDataCompleted = new TaskCompletionSource<object?>();
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (e.Data != null)
+                {
+                    errorChannel.Writer.TryWrite(e.Data);
+                }
+                else
+                {
+                    waitErrorDataCompleted.TrySetResult(null);
+                }
+            };
+
+            process.Exited += async (sender, e) =>
+            {
+                await waitErrorDataCompleted.Task.ConfigureAwait(false);
+                errorChannel.Writer.TryComplete();
+
+                if (!IsInvalidExitCode(process))
+                {
+                    var resultBin = await readTask.Task.ConfigureAwait(false);
+                    if (resultBin != null)
+                    {
+                        resultTask.TrySetResult(resultBin);
+                        return;
+                    }
+                }
+
+                cts.Cancel();
+                resultTask.TrySetException(new ProcessErrorException(process.ExitCode, Array.Empty<string>()));
+            };
+
+            if (!process.Start())
+            {
+                throw new InvalidOperationException("Can't start process. FileName:" + processStartInfo.FileName + ", Arguments:" + processStartInfo.Arguments);
+            }
+
+            RunAsyncReadFully(process.StandardOutput.BaseStream, readTask, cts.Token);
+            process.BeginErrorReadLine();
+
+            return (resultTask.Task, new ProcessAsyncEnumerable(null, errorChannel.Reader));
         }
 
         static async void RunAsyncReadFully(Stream stream, TaskCompletionSource<byte[]?> completion, CancellationToken cancellationToken)
