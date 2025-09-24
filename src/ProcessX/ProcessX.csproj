@@ -12,6 +12,7 @@
         <Description>Simplify call external process with the async streams in C# 8.0.</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
+
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
     </ItemGroup>
