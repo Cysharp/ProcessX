@@ -137,6 +137,9 @@ catch (ProcessErrorException ex)
 }
 ```
 
+If stdout is binary data, you can use `GetDualAsyncEnumerableBinary`.
+
+
 Read Binary Data
 ---
 If stdout is binary data, you can use `StartReadBinaryAsync` to read `byte[]`.
