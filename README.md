@@ -1,3 +1,6 @@
+> [!NOTE]
+> .NET 11 has [Process API Improvement](https://devblogs.microsoft.com/dotnet/process-api-improvements-in-dotnet-11/). If you are using .NET 11 or later, we recommend using it instead.
+
 [![GitHub Actions](https://github.com/Cysharp/ProcessX/workflows/Build-Debug/badge.svg)](https://github.com/Cysharp/ProcessX/actions)
 
 ProcessX
