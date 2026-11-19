@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/sandbox/">
+    <Project Path="sandbox/ConsoleApp/ConsoleApp.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/ProcessX.Analyzer/ProcessX.Analyzer.csproj" />
+    <Project Path="src/ProcessX/ProcessX.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ProcessX.Tests.Helper/ProcessX.Tests.Helper.csproj" />
+    <Project Path="tests/ProcessX.Tests/ProcessX.Tests.csproj" />
+  </Folder>
+</Solution>

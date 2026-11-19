@@ -1,24 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-        <LangVersion>8.0</LangVersion>
+        <TargetFramework>net11.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <IsAotCompatible>true</IsAotCompatible>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);CS1591</NoWarn>
 
         <!-- NuGet Packaging -->
-        <Description>Simplify call external process with the async streams in C# 8.0.</Description>
+        <Description>Write shell scripts in C#, like google/zx. Built on the .NET 11 Process API.</Description>
+        <PackageTags>process;shell;script;zx;</PackageTags>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
-    </ItemGroup>
-
+    <!-- The analyzer ships inside this package (analyzers/dotnet/cs) and also runs on this project. -->
     <ItemGroup>
-        <PackageReference Include="System.Threading.Channels" Version="4.7.0" />
+        <ProjectReference Include="..\ProcessX.Analyzer\ProcessX.Analyzer.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+        <None Include="..\ProcessX.Analyzer\bin\$(Configuration)\netstandard2.0\ProcessX.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
 
 </Project>
