@@ -28,6 +28,8 @@ var (dotnet, git, msg) = await (
 
 Save it as `build.cs` and run it with `dotnet run build.cs` (or `chmod +x build.cs && ./build.cs`).
 
+ProcessX is Native AOT compatible, so `dotnet publish build.cs` turns the script into a single native executable.
+
 Getting Started
 ---
 ProcessX requires `.NET 11` or later.
