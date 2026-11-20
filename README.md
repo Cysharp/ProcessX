@@ -24,6 +24,10 @@ var (dotnet, git, msg) = await (
     run("git --version"),
     sh("echo foo")
 );
+
+// pipe experience
+var projectDir = @"C:\Foo";
+await (sh($"dir").Cwd(projectDir) | run($"findstr cs"));
 ```
 
 Save it as `build.cs` and run it with `dotnet run build.cs` (or `chmod +x build.cs && ./build.cs`).
@@ -302,6 +306,15 @@ var result = await (run($"git log --oneline") | run($"grep {pattern}") | run($"w
 ```
 
 Options of the last command apply to the pipeline. The pipeline fails when any command in it fails, and `ExitCode` is the last non-zero one.
+
+```csharp
+var projectDir = @"C:\Foo";
+var result = await (sh($"dir").Cwd(projectDir) | run($"findstr cs")).NoThrow();
+if (result.ExitCode == 1)
+{
+    Console.WriteLine("No matched file.");
+}
+```
 
 Parallel
 ---
